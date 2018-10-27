@@ -49,3 +49,13 @@ func PostUrlIndex(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+func GetUrlIndex(c echo.Context) error {
+	hs := c.Param("hash")
+	index, _, err := SelectContents(hs)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, index)
+}
