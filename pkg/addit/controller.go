@@ -59,3 +59,29 @@ func GetUrlIndex(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, index)
 }
+
+func PostIndex(c echo.Context) error {
+	request := new(ChainRequest)
+
+	err := c.Bind(request)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	err = InsertChainIndex(request.Hash, request.Chainid)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, request)
+}
+
+func GetIndex(c echo.Context) error {
+	hs := c.Param("urlhash")
+	indexes, err := SelectChainIndex(hs)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, indexes)
+}

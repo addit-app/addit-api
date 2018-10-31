@@ -23,3 +23,12 @@ type UrlIndex struct {
 	Url     string  `xorm:"TEXT not null"               json:"url"`
 }
 
+type ChainRequest struct {
+	Hash    string  `json:"hash" form:"hash" query:"hash"`
+	Chainid int  `json:"chainid" form:"chainid" query:"chainid"`
+}
+
+type ChainIndex struct {
+	Hash      string  `xorm:"VARCHAR(65) not null" json:"hash"`
+	Chainid   int     `xorm:"INT(11) not null" json:"chainid"`
+}

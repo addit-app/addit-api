@@ -20,10 +20,10 @@ func connectDB() *xorm.Engine {
 	var engine *xorm.Engine
 
 	var (
-		DBMS_ID = GetEnv("DBMS_ID", "DBMS_ID")
-		DBMS_PW = GetEnv("DBMS_PW", "DBMS_PW")
-		CONNECT = GetEnv("CONNECT", "CONNECT")
-		TABLE   = GetEnv("TABLE",   "TABLE")
+		DBMS_ID = GetEnv("DBMS_ID", "root")
+		DBMS_PW = GetEnv("DBMS_PW", "op0023")
+		CONNECT = GetEnv("CONNECT", "127.0.0.1:3306")
+		TABLE   = GetEnv("TABLE",   "addit")
 		DbURI  = fmt.Sprintf(
 			"%s:%s@tcp(%s)/%s?%s",
 			DBMS_ID,
@@ -54,6 +54,10 @@ func connectDB() *xorm.Engine {
 
 func syncDB( engine *xorm.Engine ) {
 	if err := engine.Sync2(new(UrlIndex)); err != nil {
+		panic(err)
+	}
+
+	if err := engine.Sync2(new(ChainIndex)); err != nil {
 		panic(err)
 	}
 }
@@ -104,4 +108,35 @@ func UpdateContents(hash string, count int) (UrlIndex, error) {
 
 	index, _, err := SelectContents(hash)
 	return index, err
+}
+
+func InsertChainIndex(hash string, index int) (error) {
+	contents := new(ChainIndex)
+
+	contents.Hash = hash
+	contents.Chainid = index
+
+	engine := connectDB()
+	defer engine.Close()
+
+	_, err := engine.InsertOne(contents)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func SelectChainIndex(hash string) ([]ChainIndex, error) {
+	var indexes []ChainIndex
+
+	engine := connectDB()
+	defer engine.Close()
+
+	err := engine.Find(&indexes, &ChainIndex{Hash:hash})
+	if err != nil {
+		return indexes, err
+	}
+
+	return indexes, nil
 }
